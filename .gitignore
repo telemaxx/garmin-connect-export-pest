@@ -7,3 +7,5 @@ extras/
 *.pyc
 *.log
 lint*.txt
+csv_header_default - Kopie.properties
+tp.py
