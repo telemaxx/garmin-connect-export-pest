@@ -419,7 +419,8 @@ def parse_arguments(argv):
         help="set the local time as activity file name prefix")
     parser.add_argument('-sa', '--start_activity_no', type=int, default=1,
         help="give index for first activity to import, i.e. skipping the newest activites")
-
+    parser.add_argument('-w', '--workflowdirectory', nargs='?', default="",
+        help="if downloading activity(format: 'original' and --unzip): copy the file, given a friendly filename, to this directory (default: not copying)") 
     return parser.parse_args(argv[1:])
 
 
