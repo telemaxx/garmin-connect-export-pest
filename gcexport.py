@@ -972,7 +972,8 @@ def main(argv):
                 extract['device'] = extract_device(device_dict, details, start_time_seconds, args, http_req, write_to_file)
 
                 if args.workflowdirectory !=0:
-                    friendly_filename = sanitize_filename(actvty['activityName'] , 20) + '_' + extract['device']
+                    prefix = "{}-".format(actvty['startTimeLocal'].replace("-", "").replace(":", b"").replace(" ", "-"))
+                    friendly_filename = prefix + sanitize_filename(actvty['activityName'] , 20) + '_' + extract['device']
                 else:
                     friendly_filename = ''
 
