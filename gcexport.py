@@ -639,7 +639,7 @@ def load_gear(activity_id, args):
         # logging.exception(e)
 
 
-def export_data_file(activity_id, activity_details, args, file_time, append_desc, start_time_locale):
+def export_data_file(activity_id, activity_details, args, file_time, append_desc, start_time_locale, friendly_filename):
     """
     Write the data of the activity to a file, depending on the chosen data format
     """
@@ -740,7 +740,7 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
                     logging.debug('renaming %s to %s', unzipped_name, new_name)
                     
                     if len(args.workflowdirectory) and join(args.directory, name) != join(args.workflowdirectory, name):
-                        friendly_filename = name  # todo implement friendly_filename()
+                        #friendly_filename = name  # todo implement friendly_filename()
                         copyfile(join(args.directory, name), join(args.workflowdirectory, friendly_filename))
                         logging.info('copy file to: ' + args.workflowdirectory + '/' + friendly_filename)
                         copied_files = 1
@@ -971,6 +971,13 @@ def main(argv):
 
                 extract['device'] = extract_device(device_dict, details, start_time_seconds, args, http_req, write_to_file)
 
+                if args.workflowdirectory !=0:
+                    friendly_filename = sanitize_filename(actvty['activityName'] , 20) + '_' + extract['device']
+                else:
+                    friendly_filename = ''
+
+                print('friendly filename: ' + friendly_filename)
+
                 # try to get the JSON with all the samples (not all activities have it...),
                 # but only if it's really needed for the CSV output
                 extract['samples'] = None
@@ -996,7 +1003,7 @@ def main(argv):
                 csv_write_record(csv_filter, extract, actvty, details, activity_type_name, event_type_name)
 
                 copied_files = export_data_file(str(actvty['activityId']), activity_details, args, start_time_seconds, append_desc,
-                                 actvty['startTimeLocal'])
+                                 actvty['startTimeLocal'], friendly_filename)
                 total_copied += copied_files
             current_index += 1
         # End for loop for activities of chunk
