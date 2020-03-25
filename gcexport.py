@@ -205,8 +205,8 @@ def http_req(url, post=None, headers=None):
         response = OPENER.open(request, data=post)
     except urllib2.HTTPError as ex:
         if ex.code == 429:
-            print('\ntoo many requests try again later')
-            sys.exit()
+            print('\ntoo many requests, try again later')
+            sys.exit(1)
     except urllib2.URLError as ex:
         if hasattr(ex, 'reason'):
             logging.error('Failed to reach url %s, error: %s', url, ex)
