@@ -643,6 +643,7 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
     """
     Write the data of the activity to a file, depending on the chosen data format
     """
+    copied_files = 0
     # Time dependent subdirectory for activity files, e.g. '{YYYY}
     if not args.subdir is None:
         directory = resolve_path(args.directory, args.subdir, start_time_locale)
@@ -683,13 +684,13 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
     if isfile(data_filename):
         logging.debug('Data file for %s already exists', activity_id)
         print('\tData file already exists; skipping...')
-        return
+        return copied_files
 
     # Regardless of unzip setting, don't redownload if the ZIP or FIT file exists.
     if args.format == 'original' and isfile(fit_filename):
         logging.debug('Original data file for %s already exists', activity_id)
         print('\tFIT data file already exists; skipping...')
-        return
+        return copied_files
 
     if args.format != 'json':
         # Download the data file from Garmin Connect. If the download fails (e.g., due to timeout),
@@ -742,8 +743,7 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
                         friendly_filename = name  # todo implement friendly_filename()
                         copyfile(join(args.directory, name), join(args.workflowdirectory, friendly_filename))
                         logging.info('copy file to: ' + args.workflowdirectory + '/' + friendly_filename)
-
-                        #TOTAL_COPIED += 1
+                        copied_files = 1
 
                     move (unzipped_name, new_name)
                     logging.info('renaming %s to %s', unzipped_name, new_name)
@@ -753,7 +753,7 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
             else:
                 print('\tSkipping 0Kb zip file.')
             remove(data_filename)
-
+    return copied_files
 
 def setup_logging():
     """Setup logging"""
@@ -868,6 +868,7 @@ def main(argv):
     else:
         total_to_download = int(args.count)
     total_downloaded = 0
+    total_copied = 0
 
     device_dict = dict()
 
@@ -994,15 +995,20 @@ def main(argv):
                 # Write stats to CSV.
                 csv_write_record(csv_filter, extract, actvty, details, activity_type_name, event_type_name)
 
-                export_data_file(str(actvty['activityId']), activity_details, args, start_time_seconds, append_desc,
+                copied_files = export_data_file(str(actvty['activityId']), activity_details, args, start_time_seconds, append_desc,
                                  actvty['startTimeLocal'])
-
+                total_copied += copied_files
             current_index += 1
         # End for loop for activities of chunk
         total_downloaded += num_to_download
     # End while loop for multiple chunks.
 
     csv_file.close()
+
+    print("Total Requested...." + str(total_to_download))
+    print("Total Downloaded..." + str(total_downloaded))
+    print("Total Copied......." + str(total_copied))
+    #print("Total Skipped......" + str(TOTAL_SKIPPED))
 
     if args.external:
         print('Open CSV output.')
