@@ -205,8 +205,8 @@ def http_req(url, post=None, headers=None):
         response = OPENER.open(request, data=post)
     except urllib2.HTTPError as ex:
         if ex.code == 429:
-            logging.error('too many requests try again later')
-            raise
+            print('\ntoo many requests try again later')
+            sys.exit()
     except urllib2.URLError as ex:
         if hasattr(ex, 'reason'):
             logging.error('Failed to reach url %s, error: %s', url, ex)
@@ -668,7 +668,6 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
         prefix = "{}-".format(start_time_locale.replace("-", "").replace(":", b"").replace(" ", "-"))
     else:
         prefix = ""
-    print ('prefix:' , prefix)
     fit_filename = None
     if args.format == 'gpx':
         data_filename = directory + '/' + prefix + 'activity_' + activity_id + append_desc + '.gpx'
