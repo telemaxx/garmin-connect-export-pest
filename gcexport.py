@@ -24,7 +24,7 @@ from __future__ import print_function
 from datetime import datetime, timedelta, tzinfo
 from getpass import getpass
 from math import floor
-from os import makedirs, mkdir, rename, remove, stat, utime
+from os import makedirs, mkdir, remove, stat, utime
 from os.path import dirname, isdir, isfile, join, realpath, splitext
 from platform import python_version
 from subprocess import call
@@ -42,6 +42,7 @@ import sys
 import unicodedata
 import urllib2
 import zipfile
+import shutil
 
 SCRIPT_VERSION = '2.3.3'
 
@@ -657,7 +658,7 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
         prefix = "{}-".format(start_time_locale.replace("-", "").replace(":", b"").replace(" ", "-"))
     else:
         prefix = ""
-
+    print ('prefix:' , prefix)
     fit_filename = None
     if args.format == 'gpx':
         data_filename = directory + '/' + prefix + 'activity_' + activity_id + append_desc + '.gpx'
@@ -735,7 +736,8 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
                     name_base, name_ext = splitext(name)
                     new_name = directory + '/activity_' + name_base + append_desc + name_ext
                     logging.debug('renaming %s to %s', unzipped_name, new_name)
-                    rename(unzipped_name, new_name)
+                    shutil.move (unzipped_name, new_name)
+                    logging.info('renaming %s to %s', unzipped_name, new_name)
                     if file_time:
                         utime(new_name, (file_time, file_time))
                 zip_file.close()
