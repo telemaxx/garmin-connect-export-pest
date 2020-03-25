@@ -203,12 +203,21 @@ def http_req(url, post=None, headers=None):
     start_time = timer()
     try:
         response = OPENER.open(request, data=post)
+    except urllib2.HTTPError as ex:
+        if ex.code == 429:
+            logging.error('too many requests try again later')
+            raise
     except urllib2.URLError as ex:
         if hasattr(ex, 'reason'):
             logging.error('Failed to reach url %s, error: %s', url, ex)
             raise
         else:
             raise
+    except urllib2.HTTPError as ex:
+        if e.code == 429:
+            logging.error('too many requests try again later')
+    
+    
     logging.debug('Got %s in %s s from %s', response.getcode(), timer() - start_time, url)
 
     # N.B. urllib2 will follow any 302 redirects.
@@ -973,11 +982,9 @@ def main(argv):
 
                 if args.workflowdirectory !=0:
                     prefix = "{}-".format(actvty['startTimeLocal'].replace("-", "").replace(":", b"").replace(" ", "-"))
-                    friendly_filename = prefix + sanitize_filename(actvty['activityName'] , 20) + '_' + extract['device']
+                    friendly_filename = prefix + sanitize_filename(actvty['activityName'] , 30) + '_' + sanitize_filename(extract['device'] , 20)
                 else:
                     friendly_filename = ''
-
-                print('friendly filename: ' + friendly_filename)
 
                 # try to get the JSON with all the samples (not all activities have it...),
                 # but only if it's really needed for the CSV output
