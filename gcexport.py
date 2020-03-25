@@ -734,7 +734,8 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
                     unzipped_name = zip_obj.extract(name, directory)
                     # prepend 'activity_' and append the description to the base name
                     name_base, name_ext = splitext(name)
-                    new_name = directory + '/activity_' + name_base + append_desc + name_ext
+                    new_name = directory + '/' + prefix + 'activity_' + name_base + append_desc + name_ext
+
                     logging.debug('renaming %s to %s', unzipped_name, new_name)
                     
                     if len(args.workflowdirectory) and join(args.directory, name) != join(args.workflowdirectory, name):
