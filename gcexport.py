@@ -30,6 +30,7 @@ from platform import python_version
 from subprocess import call
 from timeit import default_timer as timer
 from urllib import urlencode
+from shutil import copyfile, move
 
 import argparse
 import cookielib
@@ -42,7 +43,6 @@ import sys
 import unicodedata
 import urllib2
 import zipfile
-import shutil
 
 SCRIPT_VERSION = '2.3.3'
 
@@ -736,7 +736,15 @@ def export_data_file(activity_id, activity_details, args, file_time, append_desc
                     name_base, name_ext = splitext(name)
                     new_name = directory + '/activity_' + name_base + append_desc + name_ext
                     logging.debug('renaming %s to %s', unzipped_name, new_name)
-                    shutil.move (unzipped_name, new_name)
+                    
+                    if len(args.workflowdirectory) and join(args.directory, name) != join(args.workflowdirectory, name):
+                        friendly_filename = name  # todo implement friendly_filename()
+                        copyfile(join(args.directory, name), join(args.workflowdirectory, friendly_filename))
+                        logging.info('copy file to: ' + args.workflowdirectory + '/' + friendly_filename)
+
+                        #TOTAL_COPIED += 1
+
+                    move (unzipped_name, new_name)
                     logging.info('renaming %s to %s', unzipped_name, new_name)
                     if file_time:
                         utime(new_name, (file_time, file_time))
